@@ -1,0 +1,80 @@
+generator client {
+  provider = "prisma-client-js"
+}
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+model Cliente {
+  id            Int      @id @default(autoincrement())
+  nome_cliente  String
+  email         String   @unique
+  telefone      String?
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
+  pedidos       Pedido[]
+  vendas         Venda[]
+}
+model Produto {
+  id            Int       @id @default(autoincrement())
+  nome_produto  String
+  descricao     String?
+  sku           String?   @unique
+  preco_unitario Float
+  created_at    DateTime  @default(now())
+  updated_at    DateTime  @updatedAt
+  estoque_total Int      @default(0)
+  itens_pedido  ItemPedido[]
+  itens_venda   ItemVenda[]
+  movimentacoes Estoque[]
+}
+model Pedido {
+  id           Int           @id @default(autoincrement())
+  clienteId    Int
+  data_pedido  DateTime      @default(now())
+  status       String        @default("PENDENTE")
+  total        Float         @default(0)
+  created_at   DateTime      @default(now())
+  updated_at   DateTime      @updatedAt
+  cliente      Cliente       @relation(fields: [clienteId], references: [id])
+  itens_pedido ItemPedido[]
+  venda        Venda?
+}
+model ItemPedido {
+  id         Int     @id @default(autoincrement())
+  pedidoId   Int
+  produtoId  Int
+  quantidade Int
+  unit_price Float
+  pedido     Pedido  @relation(fields: [pedidoId], references: [id])
+  produto    Produto @relation(fields: [produtoId], references: [id])
+}
+model Venda {
+  id           Int      @id @default(autoincrement())
+  pedidoId     Int? @unique
+  clienteId    Int?
+  data_venda   DateTime @default(now())
+  total        Float
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+  pedido       Pedido?   @relation(fields: [pedidoId], references: [id])
+  cliente      Cliente?  @relation(fields: [clienteId], references: [id])
+  itens_venda  ItemVenda[]
+}
+model ItemVenda {
+  id         Int     @id @default(autoincrement())
+  vendaId    Int
+  produtoId  Int
+  quantidade Int
+  unit_price Float
+  venda      Venda   @relation(fields: [vendaId], references: [id])
+  produto    Produto @relation(fields: [produtoId], references: [id])
+}
+model Estoque {
+  id          Int      @id @default(autoincrement())
+  produtoId   Int
+  tipo        String
+  quantidade  Int
+  created_at  DateTime @default(now())
+  produto     Produto  @relation(fields: [produtoId], references: [id])
+}
