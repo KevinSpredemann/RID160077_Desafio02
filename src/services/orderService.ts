@@ -7,7 +7,7 @@ import { orderItemSchema } from '../schemas/orderSchema';
 const orderRepo = new OrderRepository();
 type OrderItem = z.infer<typeof orderItemSchema>; // 'z.infer' extrai o tipo TypeScript do esquema Zod.
 
-export class PedidoService {
+export class OrderService {
   async createPedido(clienteId: number, itens: OrderItem[]) {
     if (itens.length === 0) throw new Error('Pedido deve ter ao menos 1 item');
 

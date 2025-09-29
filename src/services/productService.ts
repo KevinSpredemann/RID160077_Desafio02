@@ -7,7 +7,7 @@ const stockRepo = new StockRepository();
 
 type ProdutoCreatePayload = Prisma.ProdutoCreateInput & { estoque_total?: number };
 
-export class ProdutoService {
+export class ProductService {
   async createProduto(payload: ProdutoCreatePayload) {
 
     const created = await productRepo.create(payload);

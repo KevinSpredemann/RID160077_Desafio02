@@ -10,7 +10,7 @@ const productRepo = new ProductRepository();
 
 type StockMovPayload = z.infer<typeof stockMovSchema>;
 
-export class EstoqueService {
+export class StockService {
   async createMovimento(payload: StockMovPayload) {
     if (payload.quantidade <= 0) throw new Error("Quantidade deve ser positiva");
 

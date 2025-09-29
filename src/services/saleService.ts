@@ -12,7 +12,7 @@ const stockRepo = new StockRepository();
 
 type SalePayload = z.infer<typeof createSaleSchema>;
 
-export class VendaService {
+export class SaleService {
   async createVenda(payload: SalePayload) {
     if (!payload.itens || payload.itens.length === 0) throw new Error("Venda precisa ter ao menos 1 item");
     
