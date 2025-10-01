@@ -1,4 +1,4 @@
-import z, { TypeOf } from 'zod';
+import z from 'zod';
 
 export const pedidoItemSchema = z.object({
   produtoId: z

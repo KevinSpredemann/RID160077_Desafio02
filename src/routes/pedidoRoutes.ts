@@ -14,5 +14,6 @@ router.post(
 );
 router.get('/', controller.listar.bind(controller));
 router.get('/:id', controller.buscarPorId.bind(controller));
+router.delete('/:id', controller.deletar.bind(controller));
 
 export default router;

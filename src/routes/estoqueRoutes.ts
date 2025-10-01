@@ -12,7 +12,7 @@ router.post(
   controller.criarMovimento.bind(controller)
 );
 router.get(
-  '/produto/:produtoId',
+  '/:produtoId',
   controller.listarMovimentosPorProduto.bind(controller)
 );
 

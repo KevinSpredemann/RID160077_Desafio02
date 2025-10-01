@@ -87,4 +87,41 @@ export class PedidoService {
     }
     return pedido;
   }
+
+  async delete(id: number) {
+    const pedido = await prisma.pedido.findUnique({
+      where: { id },
+      include: { venda: { include: { itens_venda: true } } },
+    });
+
+    if (!pedido) {
+      throw new Error('Pedido não encontrado');
+    }
+
+    if (pedido.status.toUpperCase() === 'APROVADO') {
+      throw new Error(
+        'Pedido já APROVADO (Venda finalizada). Não pode ser deletado, apenas CANCELADO/DEVOLVIDO.'
+      );
+    }
+
+    return prisma.$transaction(async (tx) => {
+      if (pedido.venda) {
+        await tx.itemVenda.deleteMany({
+          where: { vendaId: pedido.venda.id },
+        });
+        await tx.venda.delete({
+          where: { id: pedido.venda.id },
+        });
+      }
+      await tx.itemPedido.deleteMany({
+        where: { pedidoId: id },
+      });
+
+      const deletedPedido = await tx.pedido.delete({
+        where: { id },
+      });
+
+      return deletedPedido;
+    });
+  }
 }

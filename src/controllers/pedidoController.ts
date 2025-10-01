@@ -20,4 +20,10 @@ export class PedidoController {
     const p = await service.getPedidoById(id);
     return res.json(p);
   }
+
+  async deletar(req: Request, res: Response) {
+    const id = Number(req.params.id);
+    await service.delete(id);
+    return res.status(204).send();
+  }
 }
