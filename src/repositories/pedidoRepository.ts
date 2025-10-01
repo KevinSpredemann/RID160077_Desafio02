@@ -2,19 +2,19 @@ import { Prisma } from '@prisma/client';
 import prisma from '../prisma';
 import { BaseRepository } from './baseRepository';
 
-type OrderCreateInput = Prisma.PedidoCreateInput;
-type OrderUpdateInput = Prisma.PedidoUpdateInput;
+type PedidoCreateInput = Prisma.PedidoCreateInput;
+type PedidoUpdateInput = Prisma.PedidoUpdateInput;
 
-export class OrderRepository extends BaseRepository<
+export class PedidoRepository extends BaseRepository<
   'pedido',
-  OrderCreateInput,
-  OrderUpdateInput
+  PedidoCreateInput,
+  PedidoUpdateInput
 > {
   constructor() {
     super(prisma, 'pedido');
   }
 
-  async findById(id: number) {
+  async buscarPorId(id: number) {
     return this.prisma.pedido.findUnique({
       where: { id },
       include: {
@@ -26,22 +26,13 @@ export class OrderRepository extends BaseRepository<
     });
   }
 
-  async findAll() {
+  async listar() {
     return this.prisma.pedido.findMany({
       include: {
         cliente: true,
         itens_pedido: {
           include: { produto: true },
         },
-      },
-    });
-  }
-
-  async createWithItems(data: OrderCreateInput) {
-    return this.prisma.pedido.create({
-      data,
-      include: {
-        items_pedido: true,
       },
     });
   }
