@@ -1,7 +1,7 @@
 {
-  "name": "api-controle_vendas",
+  "name": "sales-control-api",
   "version": "1.0.0",
-  "description": "",
+  "description": "Sales Control API with Express and Prisma",
   "main": "index.js",
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",

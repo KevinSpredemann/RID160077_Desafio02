@@ -1,80 +1,88 @@
 generator client {
   provider = "prisma-client-js"
 }
+
 datasource db {
   provider = "sqlite"
   url      = env("DATABASE_URL")
 }
-model Cliente {
+
+model User {
+  id          Int       @id @default(autoincrement())
+  user_name   String
+  email       String    @unique
+  phone       String?
+  created_at  DateTime  @default(now())
+  updated_at  DateTime  @updatedAt
+  orders      Order[]
+  sales       Sale[]
+}
+
+model Product {
+  id            Int          @id @default(autoincrement())
+  product_name  String
+  description   String?
+  sku           String?      @unique
+  product_price Float
+  created_at    DateTime     @default(now())
+  updated_at    DateTime     @updatedAt
+  stock_total   Int          @default(0)
+  order_items   OrderItem[]
+  sale_items    SaleItem[]
+  stock_moves   Stock[]
+}
+
+model Order {
+  id          Int          @id @default(autoincrement())
+  userId      Int
+  order_date  DateTime     @default(now())
+  status      String       @default("PENDING")
+  total       Float        @default(0)
+  created_at  DateTime     @default(now())
+  updated_at  DateTime     @updatedAt
+  user        User         @relation(fields: [userId], references: [id])
+  order_items OrderItem[]
+  sale        Sale?
+}
+
+model OrderItem {
+  id            Int     @id @default(autoincrement())
+  orderId       Int
+  productId     Int
+  item_quantity Int
+  item_price    Float
+  order         Order   @relation(fields: [orderId], references: [id])
+  product       Product @relation(fields: [productId], references: [id])
+}
+
+model Sale {
+  id          Int         @id @default(autoincrement())
+  orderId     Int?        @unique
+  userId      Int?
+  sale_date   DateTime    @default(now())
+  total       Float
+  created_at  DateTime    @default(now())
+  updated_at  DateTime    @updatedAt
+  order       Order?      @relation(fields: [orderId], references: [id])
+  user        User?       @relation(fields: [userId], references: [id])
+  sale_items  SaleItem[]
+}
+
+model SaleItem {
+  id            Int     @id @default(autoincrement())
+  saleId        Int
+  productId     Int
+  item_quantity Int
+  item_price    Float
+  sale          Sale    @relation(fields: [saleId], references: [id])
+  product       Product @relation(fields: [productId], references: [id])
+}
+
+model Stock {
   id            Int      @id @default(autoincrement())
-  nome_cliente  String
-  email         String   @unique
-  telefone      String?
+  productId     Int
+  move_type     String
+  move_quantity Int
   created_at    DateTime @default(now())
-  updated_at    DateTime @updatedAt
-  pedidos       Pedido[]
-  vendas         Venda[]
-}
-model Produto {
-  id            Int       @id @default(autoincrement())
-  nome_produto  String
-  descricao     String?
-  sku           String?   @unique
-  preco_unitario Float
-  created_at    DateTime  @default(now())
-  updated_at    DateTime  @updatedAt
-  estoque_total Int      @default(0)
-  itens_pedido  ItemPedido[]
-  itens_venda   ItemVenda[]
-  movimentacoes Estoque[]
-}
-model Pedido {
-  id           Int           @id @default(autoincrement())
-  clienteId    Int
-  data_pedido  DateTime      @default(now())
-  status       String        @default("PENDENTE")
-  total        Float         @default(0)
-  created_at   DateTime      @default(now())
-  updated_at   DateTime      @updatedAt
-  cliente      Cliente       @relation(fields: [clienteId], references: [id])
-  itens_pedido ItemPedido[]
-  venda        Venda?
-}
-model ItemPedido {
-  id         Int     @id @default(autoincrement())
-  pedidoId   Int
-  produtoId  Int
-  quantidade Int
-  unit_price Float
-  pedido     Pedido  @relation(fields: [pedidoId], references: [id])
-  produto    Produto @relation(fields: [produtoId], references: [id])
-}
-model Venda {
-  id           Int      @id @default(autoincrement())
-  pedidoId     Int? @unique
-  clienteId    Int?
-  data_venda   DateTime @default(now())
-  total        Float
-  created_at   DateTime @default(now())
-  updated_at   DateTime @updatedAt
-  pedido       Pedido?   @relation(fields: [pedidoId], references: [id])
-  cliente      Cliente?  @relation(fields: [clienteId], references: [id])
-  itens_venda  ItemVenda[]
-}
-model ItemVenda {
-  id         Int     @id @default(autoincrement())
-  vendaId    Int
-  produtoId  Int
-  quantidade Int
-  unit_price Float
-  venda      Venda   @relation(fields: [vendaId], references: [id])
-  produto    Produto @relation(fields: [produtoId], references: [id])
-}
-model Estoque {
-  id          Int      @id @default(autoincrement())
-  produtoId   Int
-  tipo        String
-  quantidade  Int
-  created_at  DateTime @default(now())
-  produto     Produto  @relation(fields: [produtoId], references: [id])
+  product       Product  @relation(fields: [productId], references: [id])
 }

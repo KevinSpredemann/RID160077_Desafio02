@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { validateBody } from '../middlewares/validateBody';
-import { ProdutoController } from '../controllers/produtoController';
+import { ProdutoController } from '../controllers/productController';
 import { produtoSchema } from '../schemas/produtoSchema';
 
 

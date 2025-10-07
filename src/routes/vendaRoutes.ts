@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { validateBody } from '../middlewares/validateBody';
-import { VendaController } from '../controllers/vendaController';
+import { VendaController } from '../controllers/saleController';
 import { createVendaSchema } from '../schemas/vendaSchema';
 
 const router = Router();

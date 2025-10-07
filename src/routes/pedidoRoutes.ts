@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { validateBody } from '../middlewares/validateBody';
-import { PedidoController } from '../controllers/pedidoController';
+import { PedidoController } from '../controllers/orderController';
 import { createPedidoSchema } from '../schemas/pedidoSchema';
 
 

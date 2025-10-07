@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { validateBody } from '../middlewares/validateBody';
-import { EstoqueController } from '../controllers/estoqueController';
+import { EstoqueController } from '../controllers/stockController';
 import { estoqueMovSchema } from '../schemas/estoqueSchema';
 
 const router = Router();
