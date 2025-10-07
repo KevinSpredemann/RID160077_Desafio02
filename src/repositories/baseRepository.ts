@@ -1,8 +1,8 @@
 import { Prisma, PrismaClient } from "@prisma/client";
 
-type NomeModelo = keyof PrismaClient;
+type ModelName = keyof PrismaClient;
 
-export class BaseRepository<T extends NomeModelo, CreateInput, UpdateInput> {
+export class BaseRepository<T extends ModelName, CreateInput, UpdateInput> {
     protected prisma: any;
     protected modelName: T;
 
@@ -11,23 +11,23 @@ export class BaseRepository<T extends NomeModelo, CreateInput, UpdateInput> {
         this.modelName = modelName;
     }
 
-    async criar(data: CreateInput) {
+    async create(data: CreateInput) {
         return this.prisma[this.modelName].create({ data });
     }
 
-    async buscarPorId(id: number, include?: any) {
+    async findById(id: number, include?: any) {
         return this.prisma[this.modelName].findUnique({ where: { id }, include });
     }
 
-    async buscar(include?: any) {
+    async findAll(include?: any) {
         return this.prisma[this.modelName].findMany({ include });
     }
 
-    async atualizar(id: number, data: UpdateInput) {
+    async updated(id: number, data: UpdateInput) {
         return this.prisma[this.modelName].update({ where: { id }, data });
     }
 
-    async deletar(id: number) {
+    async delete(id: number) {
         return this.prisma[this.modelName].delete({ where: { id } });
     }
 }

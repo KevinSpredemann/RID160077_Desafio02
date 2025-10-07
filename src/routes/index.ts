@@ -1,16 +1,16 @@
 import { Router } from 'express';
-import pedidoRoutes from './pedidoRoutes';
-import clienteRoutes from './clienteRoutes';
-import vendaRoutes from './vendaRoutes';
-import estoqueRoutes from './estoqueRoutes';
-import produtoRoutes from './produtoRoutes';
+import productRoutes from './productRoutes';
+import clientRoutes from './clientRoutes';
+import orderRoutes from './orderRoutes';
+import saleRoutes from './saleRoutes';
+import stockRoutes from './stockRoutes';
 
 const router = Router();
 
-router.use('/produtos', produtoRoutes);
-router.use('/clientes', clienteRoutes);
-router.use('/pedidos', pedidoRoutes);
-router.use('/vendas', vendaRoutes);
-router.use('/estoque', estoqueRoutes);
+router.use('/products', productRoutes);
+router.use('/clients', clientRoutes);
+router.use('/orders', orderRoutes);
+router.use('/sales', saleRoutes);
+router.use('/stock', stockRoutes);
 
 export default router;

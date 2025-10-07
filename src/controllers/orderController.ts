@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { PedidoService } from '../services/pedidoService';
+import { OrderService } from '../services/OrderService';
 
 export class OrderController {
 

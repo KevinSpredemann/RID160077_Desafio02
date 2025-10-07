@@ -1,21 +1,21 @@
 import prisma from '../prisma';
 import { z } from 'zod';
-import { vendaItemSchema, createVendaSchema } from '../schemas/saleSchema';
-import { VendaRepository } from '../repositories/vendaRepository';
-import { EstoqueRepository } from '../repositories/estoqueRepository';
+import { SaleRepository } from '../repositories/vendaRepository';
+import { StockRepository } from '../repositories/stockRepository';
+import { createSaleSchema, saleItemSchema } from '../schemas/saleSchema';
 
-const vendaRepo = new VendaRepository();
-const estoqueService = new EstoqueRepository();
+const saleRepo = new SaleRepository();
+const stockRepo = new StockRepository();
 
-type CreateVendaPayload = z.infer<typeof createVendaSchema>;
-type VendaItem = z.infer<typeof vendaItemSchema> & { unit_price: number };
+type CreateSalePayload = z.infer<typeof createSaleSchema>;
+type SaleItem = z.infer<typeof saleItemSchema> & { unit_price: number };
 
 export class SaleService {
-  async createVenda(payload: CreateVendaPayload) {
-    if (payload.pedidoId) {
-      return this.processarVendaPorPedido(payload.pedidoId);
+  async create(payload: CreateSalePayload) {
+    if (payload.orderId) {
+      return this.createByOrder(payload.orderId);
     }
-    if (!payload.clienteId || !payload.itens || payload.itens.length === 0) {
+    if (!payload.clientId || !payload.itens || payload.itens.length === 0) {
       throw new Error(
         'Dados inválidos. Forneça pedidoId OU clienteId e itens.'
       );
@@ -24,109 +24,109 @@ export class SaleService {
       'Criação de Venda manual ainda não implementada. Use a rota de Pedido e converta.'
     );
   }
-  async processarVendaPorPedido(pedidoId: number) {
-    const pedido = await prisma.pedido.findUnique({
-      where: { id: pedidoId },
-      include: { itens_pedido: true, venda: true },
+  async createByOrder(orderId: number) {
+    const order = await prisma.order.findUnique({
+      where: { id: orderId },
+      include: { order_items: true, sale: true },
     });
 
-    if (!pedido) {
-      throw new Error(`Pedido ${pedidoId} não encontrado.`);
+    if (!order) {
+      throw new Error(`Pedido ${orderId} não encontrado.`);
     }
-    if (pedido.status !== 'PENDENTE') {
+    if (order.status !== 'PENDING') {
       throw new Error(
-        `Pedido ${pedidoId} já foi processado (Status: ${pedido.status}).`
+        `Pedido ${orderId} já foi processado (Status: ${order.status}).`
       );
     }
-    if (pedido.venda) {
+    if (order.sale) {
       throw new Error(
-        `Pedido ${pedidoId} já possui uma Venda associada (Venda ID: ${pedido.venda.id}).`
+        `Pedido ${orderId} já possui uma Venda associada (Venda ID: ${order.sale.id}).`
       );
     }
 
-    const itensVenda = await Promise.all(
-      pedido.itens_pedido.map(async (item) => {
-        const produto = await prisma.produto.findUnique({
-          where: { id: item.produtoId },
+    const items = await Promise.all(
+      order.order_items.map(async (item) => {
+        const product = await prisma.product.findUnique({
+          where: { id: item.productId },
         });
 
-        if (!produto) {
+        if (!product) {
           throw new Error(
-            `Produto ${item.produtoId} do pedido não encontrado.`
+            `Produto ${item.productId} do pedido não encontrado.`
           );
         }
-        if (produto.estoque_total < item.quantidade) {
+        if (product.stock_total < item.item_quantity) {
           throw new Error(
-            `Estoque insuficiente para o produto ${produto.nome_produto} (ID: ${item.produtoId}). Disponível: ${produto.estoque_total}, Pedido: ${item.quantidade}`
+            `Estoque insuficiente para o produto ${product.product_name} (ID: ${item.productId}). Disponível: ${product.stock_total}, Pedido: ${item.item_quantity}`
           );
         }
 
         return {
-          produtoId: item.produtoId,
-          quantidade: item.quantidade,
-          unit_price: item.unit_price,
+          productId: item.productId,
+          item_quantity: item.item_quantity,
+          item_price: item.item_price,
         };
       })
     );
 
     return prisma.$transaction(async (tx) => {
-      const createdVenda = await tx.venda.create({
+      const createdSale = await tx.sale.create({
         data: {
-          pedidoId: pedido.id,
-          clienteId: pedido.clienteId,
-          total: pedido.total,
+          orderId: order.id,
+          clientId: order.clientId,
+          total: order.total,
         },
       });
 
-      for (const item of itensVenda) {
-        await tx.itemVenda.create({
+      for (const item of items) {
+        await tx.saleItem.create({
           data: {
-            vendaId: createdVenda.id,
-            produtoId: item.produtoId,
-            quantidade: item.quantidade,
-            unit_price: item.unit_price,
+            saleId: createdSale.id,
+            productId: item.productId,
+            item_quantity: item.item_quantity,
+            item_price: item.item_price,
           },
         });
 
-        await tx.produto.update({
-          where: { id: item.produtoId },
-          data: { estoque_total: { decrement: item.quantidade } },
+        await tx.product.update({
+          where: { id: item.productId },
+          data: { stock_total: { decrement: item.item_quantity } },
         });
 
-        await tx.estoque.create({
+        await tx.stock.create({
           data: {
-            produtoId: item.produtoId,
-            tipo: 'saida',
-            quantidade: item.quantidade,
+            productId: item.productId,
+            move_type: 'saida',
+            move_quantity: item.item_quantity,
           },
         });
       }
 
-      await tx.pedido.update({
-        where: { id: pedidoId },
-        data: { status: 'APROVADO' },
+      await tx.order.update({
+        where: { id: order.id },
+        data: { status: 'APPROVED' },
       });
 
-      return tx.venda.findUnique({
-        where: { id: createdVenda.id },
+      return tx.sale.findUnique({
+        where: { id: createdSale.id },
         include: {
-          itens_venda: { include: { produto: true } },
-          cliente: true,
-          pedido: true,
+          sale_items: { include: { product: true } },
+          client: true,
+          order: true,
         },
       });
     });
   }
 
-  async listVendas() {
-    return vendaRepo.buscar();
+  async findAll() {
+    return saleRepo.findAll();
   }
 
-  async getVendaById(id: number) {
-    const venda = await vendaRepo.buscarPorId(id);
-    if (!venda) {
+  async findById(id: number) {
+    const sale = await saleRepo.findById(id);
+    if (!sale) {
       throw new Error('Venda não encontrada');
     }
-    return venda;
+    return sale;
   }
 }

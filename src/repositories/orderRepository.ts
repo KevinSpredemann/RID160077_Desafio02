@@ -2,24 +2,23 @@ import { Prisma } from '@prisma/client';
 import prisma from '../prisma';
 import { BaseRepository } from './baseRepository';
 
-type SaleCreateInput = Prisma.SaleCreateInput;
-type SaleUpdateInput = Prisma.SaleUpdateInput;
+type OrderCreateInput = Prisma.OrderCreateInput;
+type OrderUpdateInput = Prisma.OrderUpdateInput;
 
-export class SaleRepository extends BaseRepository<
-  'sale',
-  SaleCreateInput,
-  SaleUpdateInput
+export class OrderRepository extends BaseRepository<
+  'order',
+  OrderCreateInput,
+  OrderUpdateInput
 > {
   constructor() {
-    super(prisma, 'sale');
+    super(prisma, 'order');
   }
 
   async findById(id: number) {
-    return this.prisma.sale.findUnique({
+    return this.prisma.order.findUnique({
       where: { id },
       include: {
         client: true,
-        order: true,
         order_items: {
           include: { product: true },
         },
@@ -28,10 +27,9 @@ export class SaleRepository extends BaseRepository<
   }
 
   async findAll() {
-    return this.prisma.sale.findMany({
+    return this.prisma.order.findMany({
       include: {
-        clien: true,
-        order: true,
+        client: true,
         order_items: {
           include: { product: true },
         },

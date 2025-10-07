@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { EstoqueService } from '../services/estoqueService';
+import { EstoqueService } from '../services/stockService';
 
 export class StockController {
 
