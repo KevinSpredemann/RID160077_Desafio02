@@ -1,11 +1,11 @@
 import { Request, Response } from 'express';
-import { ClientService } from '../services/ClientService';
+import { ClientService } from '../services/clientService';
 
 export class ClientController {
   private clientService: ClientService;
 
   constructor() {
-    this.clientService = new ClientService ();
+    this.clientService = new ClientService();
   }
 
   async create(req: Request, res: Response) {

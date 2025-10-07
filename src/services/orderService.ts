@@ -7,17 +7,17 @@ const orderRepo = new OrderRepository();
 type OrderItem = z.infer<typeof orderItemSchema>;
 
 export class OrderService {
-  async create(payload: { clienteId: number; itens: OrderItem[] }) {
-    const { clienteId, itens } = payload;
+  async create(payload: { clientId: number; itens: OrderItem[] }) {
+    const { clientId, itens } = payload;
 
     if (itens.length === 0) throw new Error('Pedido deve ter ao menos 1 item');
 
     const client = await prisma.client.findUnique({
-      where: { id: clienteId },
+      where: { id: clientId },
     });
 
     if (!client) {
-      throw new Error(`Cliente ${clienteId} não encontrado.`);
+      throw new Error(`Cliente ${clientId} não encontrado.`);
     }
 
     const itemsWithPrice = await Promise.all(
@@ -42,7 +42,7 @@ export class OrderService {
     const order = await prisma.$transaction(async (tx) => {
       const created = await tx.order.create({
         data: {
-          client: { connect: { id: clienteId } },
+          client: { connect: { id: clientId } },
           status: 'PENDING',
         },
       });

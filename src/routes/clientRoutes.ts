@@ -3,7 +3,6 @@ import { validateBody } from '../middlewares/validateBody';
 import { ClientController } from '../controllers/clientController';
 import { createClientSchema } from '../schemas/clientSchema';
 
-
 const router = Router();
 const controller = new ClientController();
 

@@ -13,7 +13,7 @@ export class StockService {
       throw new Error('Quantidade deve ser positiva');
 
     return prisma.$transaction(async (tx) => {
-      if (payload.mov_type === 'entrada') {
+      if (payload.move_type === 'entrada') {
         await tx.product.update({
           where: { id: payload.productId },
           data: { stock_total: { increment: payload.move_quantity } },
@@ -35,7 +35,7 @@ export class StockService {
       return tx.stock.create({
         data: {
           product: { connect: { id: payload.productId } },
-          move_type: payload.mov_type,
+          move_type: payload.move_type,
           move_quantity: payload.move_quantity,
         },
       });

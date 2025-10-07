@@ -1,8 +1,7 @@
 import { Request, Response } from 'express';
-import { EstoqueService } from '../services/stockService';
+import { StockService } from '../services/StockService';
 
 export class StockController {
-
   private stockService: StockService;
 
   constructor() {
@@ -13,9 +12,9 @@ export class StockController {
     return res.status(201).json(created);
   }
 
-  async listMovForProduct(req: Request, res: Response) { 
+  async listMovForProduct(req: Request, res: Response) {
     const productId = Number(req.params.productId);
-    const movs = await this.stockService.listMovForProduct(productId);
+    const movs = await this.stockService.findProductById(productId);
     return res.json(movs);
   }
 }
