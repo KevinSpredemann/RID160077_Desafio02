@@ -1,24 +1,24 @@
 import z from 'zod';
 
-export const pedidoItemSchema = z.object({
-  produtoId: z
+export const orderItemSchema = z.object({
+  productId: z
     .number()
     .int()
     .positive('ID do produto deve ser um número positivo'),
-  quantidade: z
+  item_quantity: z
     .number()
     .int()
     .positive('Quantidade deve ser um número positivo'),
 });
 
-export type OrderItemSchema = typeof pedidoItemSchema;
+export type OrderItemSchema = typeof orderItemSchema;
 
-export const createPedidoSchema = z.object({
-  clienteId: z
+export const createOrderSchema = z.object({
+  clientId: z
     .number()
     .int()
     .positive('ID do cliente deve ser um número positivo'),
   itens: z
-    .array(pedidoItemSchema)
+    .array(orderItemSchema)
     .min(1, 'O pedido deve conter ao menos um item'),
 });

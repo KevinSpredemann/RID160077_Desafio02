@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { validateBody } from '../middlewares/validateBody';
 import { VendaController } from '../controllers/saleController';
-import { createVendaSchema } from '../schemas/vendaSchema';
+import { createVendaSchema } from '../schemas/saleSchema';
 
 const router = Router();
 const controller = new VendaController();

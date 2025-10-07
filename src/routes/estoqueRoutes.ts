@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { validateBody } from '../middlewares/validateBody';
 import { EstoqueController } from '../controllers/stockController';
-import { estoqueMovSchema } from '../schemas/estoqueSchema';
+import { estoqueMovSchema } from '../schemas/stockSchema';
 
 const router = Router();
 const controller = new EstoqueController();

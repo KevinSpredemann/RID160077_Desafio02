@@ -1,7 +1,7 @@
 import prisma from '../prisma';
 import { z } from 'zod';
 import { EstoqueRepository } from '../repositories/estoqueRepository';
-import { estoqueMovSchema } from '../schemas/estoqueSchema';
+import { estoqueMovSchema } from '../schemas/stockSchema';
 
 const estoqueRepo = new EstoqueRepository();
 

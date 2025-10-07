@@ -1,9 +1,8 @@
 import prisma from '../prisma';
 import { z } from 'zod';
-import { vendaItemSchema, createVendaSchema } from '../schemas/vendaSchema';
+import { vendaItemSchema, createVendaSchema } from '../schemas/saleSchema';
 import { VendaRepository } from '../repositories/vendaRepository';
 import { EstoqueRepository } from '../repositories/estoqueRepository';
-
 
 const vendaRepo = new VendaRepository();
 const estoqueService = new EstoqueRepository();
